@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Anrufprotokoll — Design-Entwurf · Leadary</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#0a0a0a; --muted-fg:#6b7280; --label:#9ca3af;
+    --border:#e5e7eb; --border-soft:#eef0f2; --muted-bg:#f6f7f9;
+    --brand:#4f46e5; --brand-2:#818cf8; --brand-soft:#eef0fe;
+    --success:#1e9e63; --success-soft:#e7f6ef;
+    --warning:#ea8a0b; --warning-soft:#fdf1e1;
+    --danger:#dc2626; --danger-soft:#fdeaea;
+    --neutral:#cbd5e1;
+    --radius:12px;
+    --shadow:0 4px 24px -8px rgba(10,10,10,.10);
+  }
+  *{box-sizing:border-box}
+  html{font-size:15px}
+  body{
+    margin:0; background:var(--muted-bg); color:var(--fg);
+    font-family:'Inter',ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased; font-feature-settings:"cv02","cv03","cv04","cv11","ss01";
+  }
+  h1,h2,h3,h4{letter-spacing:-.01em; font-weight:600; margin:0}
+  .tabnum{font-variant-numeric:tabular-nums}
+  .wrap{max-width:1180px; margin:0 auto; padding:40px 28px 80px}
+
+  /* page header */
+  .ph-eyebrow{font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--label)}
+  .ph-title{font-size:28px; margin-top:8px; letter-spacing:-.02em}
+  .ph-sub{color:var(--muted-fg); font-size:14px; margin-top:6px}
+
+  .card{background:var(--bg); border:1px solid var(--border); border-radius:var(--radius)}
+
+  /* KPI cards */
+  .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:28px}
+  .kpi{padding:18px 20px 16px}
+  .kpi-top{display:flex; align-items:center; justify-content:space-between}
+  .kpi-chip{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--muted-bg);color:var(--muted-fg)}
+  .kpi-chip svg{width:17px;height:17px}
+  .kpi-label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-fg);margin-top:14px}
+  .kpi-value{font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.05;margin-top:6px}
+  .kpi-value span{font-size:18px;color:var(--muted-fg)}
+  .kpi-delta{font-size:12px;margin-top:8px;display:flex;align-items:center;gap:5px}
+  .up{color:var(--success)} .down{color:var(--danger)}
+  .kpi-delta .muted{color:var(--label)}
+  .spark{margin-top:12px}
+
+  /* charts row */
+  .charts{display:grid; grid-template-columns:1.55fr 1fr 1fr; gap:16px; margin-top:16px}
+  .c-head{display:flex; align-items:center; justify-content:space-between; padding:18px 20px 0}
+  .c-title{font-size:15px}
+  .c-body{padding:14px 20px 20px}
+  .pill-toggle{display:inline-flex;background:var(--muted-bg);border-radius:999px;padding:3px}
+  .pill-toggle button{border:0;background:transparent;font:inherit;font-size:12px;font-weight:500;color:var(--muted-fg);padding:5px 12px;border-radius:999px;cursor:pointer}
+  .pill-toggle button.active{background:var(--fg);color:#fff}
+
+  .legend{display:flex;flex-direction:column;gap:11px;margin-top:4px}
+  .leg-row{display:flex;align-items:center;gap:9px;font-size:13px}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .leg-row .name{color:var(--fg)}
+  .leg-row .val{margin-left:auto;color:var(--muted-fg);font-variant-numeric:tabular-nums}
+
+  .donut-wrap{display:flex;align-items:center;gap:18px}
+  .donut-center{position:relative;width:132px;height:132px;flex:none}
+  .donut-center .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .donut-center .ctr .big{font-size:24px;font-weight:600;letter-spacing:-.02em}
+  .donut-center .ctr .small{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-fg);margin-top:2px}
+
+  .vol-meta{margin-top:14px;display:flex;flex-direction:column;gap:8px;font-size:13px}
+  .vol-meta .r{display:flex;align-items:center;gap:8px;color:var(--muted-fg)}
+  .vol-meta .r b{color:var(--fg);font-weight:600;font-variant-numeric:tabular-nums}
+  .link{color:var(--brand);font-size:13px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-top:12px}
+  .link:hover{text-decoration:underline}
+
+  /* table */
+  .table-card{margin-top:16px;overflow:hidden}
+  .tc-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border)}
+  .search{position:relative}
+  .search input{border:1px solid var(--input,#e3e6ea);border-radius:9px;font:inherit;font-size:13px;padding:8px 12px 8px 32px;width:230px;outline:none;background:var(--bg)}
+  .search input:focus{border-color:var(--brand)}
+  .search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--label)}
+  .btn-ghost{border:1px solid var(--border);background:var(--bg);font:inherit;font-size:13px;font-weight:500;color:var(--fg);padding:8px 14px;border-radius:9px;cursor:pointer}
+  .btn-ghost:hover{background:var(--muted-bg)}
+
+  table{width:100%;border-collapse:collapse}
+  thead th{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted-fg);text-align:left;padding:12px 16px;border-bottom:1px solid var(--border)}
+  thead th.r{text-align:right} thead th.c{text-align:center}
+  tbody td{padding:13px 16px;font-size:13.5px;border-bottom:1px solid var(--border-soft);vertical-align:middle}
+  tbody tr{cursor:pointer;transition:background .12s}
+  tbody tr:hover{background:var(--muted-bg)}
+  tbody tr.sel{background:var(--brand-soft)}
+  .who{font-weight:500}
+  .sub{color:var(--muted-fg);font-size:12px}
+  .num{font-variant-numeric:tabular-nums;color:var(--muted-fg)}
+  .r{text-align:right} .c{text-align:center}
+  .badge{display:inline-block;font-size:12px;font-weight:500;padding:4px 11px;border-radius:999px;white-space:nowrap}
+  .b-green{background:var(--success-soft);color:var(--success)}
+  .b-indigo{background:var(--brand-soft);color:var(--brand)}
+  .b-orange{background:var(--warning-soft);color:var(--warning)}
+  .b-gray{background:var(--muted-bg);color:var(--muted-fg)}
+  .intent{color:var(--muted-fg);font-size:13px}
+  .act{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+  .icbtn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted-fg)}
+  .icbtn:hover{background:var(--muted-bg);color:var(--fg)}
+  .icbtn svg{width:15px;height:15px}
+
+  .tc-foot{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+  .pg{display:flex;gap:6px}
+  .pg button{min-width:34px;height:34px;border:1px solid var(--border);background:var(--bg);border-radius:8px;font:inherit;font-size:13px;color:var(--fg);cursor:pointer;font-variant-numeric:tabular-nums}
+  .pg button.active{background:var(--fg);color:#fff;border-color:var(--fg)}
+  .pg button:hover:not(.active){background:var(--muted-bg)}
+
+  /* drawer */
+  .scrim{position:fixed;inset:0;background:rgba(10,10,10,.28);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
+  .scrim.show{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;right:0;height:100vh;width:440px;max-width:92vw;background:var(--bg);border-left:1px solid var(--border);box-shadow:var(--shadow);transform:translateX(100%);transition:transform .28s cubic-bezier(.32,.72,.24,1);z-index:50;display:flex;flex-direction:column}
+  .drawer.show{transform:translateX(0)}
+  .d-head{padding:20px 22px 16px;border-bottom:1px solid var(--border)}
+  .d-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .d-id{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-fg)}
+  .d-name{font-size:20px;margin-top:5px;letter-spacing:-.02em}
+  .d-meta{color:var(--muted-fg);font-size:13px;margin-top:4px;font-variant-numeric:tabular-nums}
+  .x{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted-fg);flex:none}
+  .x:hover{background:var(--muted-bg);color:var(--fg)}
+  .d-tabs{display:flex;gap:4px;margin-top:16px;background:var(--muted-bg);padding:3px;border-radius:9px}
+  .d-tabs button{flex:1;border:0;background:transparent;font:inherit;font-size:13px;font-weight:500;color:var(--muted-fg);padding:7px;border-radius:7px;cursor:pointer}
+  .d-tabs button.active{background:var(--bg);color:var(--fg);box-shadow:0 1px 2px rgba(10,10,10,.06)}
+  .d-body{padding:20px 22px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:20px}
+  .d-sec h4{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-fg);margin-bottom:9px}
+  .d-sum{font-size:13.5px;line-height:1.6;color:#374151}
+  .d-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .d-field{background:var(--muted-bg);border-radius:10px;padding:11px 13px}
+  .d-field .k{font-size:11px;color:var(--muted-fg);margin-bottom:4px}
+  .d-field .v{font-size:13.5px;font-weight:500}
+  .player{display:flex;align-items:center;gap:12px;background:var(--muted-bg);border-radius:10px;padding:11px 14px}
+  .player .play{width:34px;height:34px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+  .player .play svg{width:15px;height:15px}
+  .pbar{flex:1;height:4px;border-radius:2px;background:#e3e6ea;position:relative;overflow:hidden}
+  .pbar i{position:absolute;left:0;top:0;bottom:0;width:34%;background:var(--brand);border-radius:2px}
+  .ptime{font-size:12px;color:var(--muted-fg);font-variant-numeric:tabular-nums}
+  textarea{width:100%;border:1px solid var(--border);border-radius:10px;font:inherit;font-size:13.5px;padding:11px 13px;resize:vertical;min-height:74px;outline:none}
+  textarea:focus{border-color:var(--brand)}
+  .tags{display:flex;flex-wrap:wrap;gap:7px}
+  .tag{font-size:12px;font-weight:500;padding:5px 11px;border-radius:999px;background:var(--muted-bg);color:var(--muted-fg)}
+  .d-foot{padding:16px 22px;border-top:1px solid var(--border);display:flex;gap:10px}
+  .btn-primary{flex:1;background:var(--fg);color:#fff;border:0;font:inherit;font-size:13.5px;font-weight:500;padding:11px;border-radius:9px;cursor:pointer}
+  .btn-primary:hover{background:#222}
+
+  .note{max-width:1180px;margin:0 auto;padding:14px 28px 0}
+  .note-in{background:var(--brand-soft);border:1px solid #d9dcfb;border-radius:10px;padding:11px 15px;font-size:12.5px;color:#3730a3}
+
+  @media(max-width:980px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .charts{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="note"><div class="note-in">🎨 <b>Design-Entwurf</b> — nur zur Ansicht, nicht das echte Dashboard. Beispieldaten. Klick auf eine Anrufzeile öffnet die Detail-Spalte rechts.</div></div>
+
+<div class="wrap">
+
+  <!-- Page header -->
+  <div class="ph-eyebrow">Assistent · Clara</div>
+  <h1 class="ph-title">Anrufprotokoll</h1>
+  <p class="ph-sub">Übersicht aller eingegangenen Anrufe Ihres Assistenten – neueste zuerst.</p>
+
+  <!-- KPIs -->
+  <div class="kpis">
+    <div class="card kpi">
+      <div class="kpi-top">
+        <div class="kpi-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13 1.05.36 2.07.7 3a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.96.34 1.97.57 3 .7A2 2 0 0 1 22 16.92z"/></svg></div>
+        <span class="spark">
+          <svg width="62" height="24" viewBox="0 0 62 24"><polyline fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="2,18 12,14 22,16 32,9 42,11 52,5 60,3"/></svg>
+        </span>
+      </div>
+      <div class="kpi-label">Eingegangene Anrufe</div>
+      <div class="kpi-value tabnum">1.248</div>
+      <div class="kpi-delta"><span class="up">▲ 18,6 %</span> <span class="muted">vs. Vorperiode</span></div>
+    </div>
+
+    <div class="card kpi">
+      <div class="kpi-top">
+        <div class="kpi-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <span class="spark"><svg width="62" height="24" viewBox="0 0 62 24"><polyline fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="2,19 12,17 22,12 32,13 42,8 52,7 60,4"/></svg></span>
+      </div>
+      <div class="kpi-label">Vereinbarte Termine</div>
+      <div class="kpi-value tabnum">184</div>
+      <div class="kpi-delta"><span class="up">▲ 23,4 %</span> <span class="muted">vs. Vorperiode</span></div>
+    </div>
+
+    <div class="card kpi">
+      <div class="kpi-top">
+        <div class="kpi-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <span class="spark"><svg width="62" height="24" viewBox="0 0 62 24"><polyline fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="2,16 12,17 22,13 32,14 42,10 52,9 60,6"/></svg></span>
+      </div>
+      <div class="kpi-label">Gesprächsminuten</div>
+      <div class="kpi-value tabnum">4.932</div>
+      <div class="kpi-delta"><span class="up">▲ 15,7 %</span> <span class="muted">vs. Vorperiode</span></div>
+    </div>
+
+    <div class="card kpi">
+      <div class="kpi-top">
+        <div class="kpi-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9a2.5 2 0 0 0-2.5-1.5c-1.4 0-2.5.7-2.5 1.8 0 2.7 5 1.3 5 4 0 1.1-1.1 1.9-2.5 1.9A2.6 2 0 0 1 9 13.8M12 6v1.5M12 16.5V18"/></svg></div>
+        <span class="spark"><svg width="62" height="24" viewBox="0 0 62 24"><polyline fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="2,17 12,15 22,15 32,10 42,9 52,6 60,4"/></svg></span>
+      </div>
+      <div class="kpi-label">Eingesparte Kosten</div>
+      <div class="kpi-value tabnum">12.680 <span>€</span></div>
+      <div class="kpi-delta"><span class="up">▲ 21,3 %</span> <span class="muted">vs. Vorperiode</span></div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts">
+    <!-- Line: Anrufe & Termine -->
+    <div class="card">
+      <div class="c-head">
+        <h3 class="c-title">Anrufe &amp; Termine im Zeitverlauf</h3>
+        <div class="pill-toggle">
+          <button class="active">Täglich</button>
+          <button>Wöchentlich</button>
+        </div>
+      </div>
+      <div class="c-body">
+        <svg id="line" width="100%" height="200" viewBox="0 0 560 200" preserveAspectRatio="none" style="overflow:visible"></svg>
+        <div style="display:flex;gap:18px;margin-top:14px;padding-left:34px">
+          <div class="leg-row" style="font-size:12.5px"><span class="dot" style="background:var(--brand)"></span><span class="name">Anrufe</span></div>
+          <div class="leg-row" style="font-size:12.5px"><span class="dot" style="background:var(--success)"></span><span class="name">Termine</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donut: Monatliches Volumen -->
+    <div class="card">
+      <div class="c-head"><h3 class="c-title">Monatliches Volumen</h3></div>
+      <div class="c-body">
+        <div class="donut-wrap">
+          <div class="donut-center">
+            <svg width="132" height="132" viewBox="0 0 132 132">
+              <circle cx="66" cy="66" r="54" fill="none" stroke="#eef0f2" stroke-width="15"/>
+              <circle cx="66" cy="66" r="54" fill="none" stroke="var(--brand)" stroke-width="15" stroke-linecap="round"
+                      stroke-dasharray="339.3" stroke-dashoffset="95" transform="rotate(-90 66 66)"/>
+            </svg>
+            <div class="ctr"><div class="big">72 %</div><div class="small">Verbraucht</div></div>
+          </div>
+          <div style="flex:1">
+            <div class="vol-meta">
+              <div class="r"><span class="dot" style="background:var(--brand)"></span>Verbraucht <b style="margin-left:auto">7.240 Min</b></div>
+              <div class="r"><span class="dot" style="background:#eef0f2"></span>Verbleibend <b style="margin-left:auto">2.760 Min</b></div>
+            </div>
+            <div style="font-size:12px;color:var(--label);margin-top:12px">Reset am 01. Juli 2024</div>
+            <div style="font-size:12px;color:var(--muted-fg);margin-top:2px">10.000 Min / Monat · Premium</div>
+            <a class="link" href="#">Tarif verwalten →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donut: Ergebnisse -->
+    <div class="card">
+      <div class="c-head"><h3 class="c-title">Ergebnisse (Gesamt)</h3></div>
+      <div class="c-body">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px">
+          <div class="donut-center" style="width:104px;height:104px">
+            <svg width="104" height="104" viewBox="0 0 104 104" id="resdonut"></svg>
+            <div class="ctr"><div class="big" style="font-size:20px">1.248</div><div class="small">Gesamt</div></div>
+          </div>
+          <div class="legend" style="flex:1">
+            <div class="leg-row"><span class="dot" style="background:var(--brand)"></span><span class="name">Anfrage beantwortet</span><span class="val">42 % · 523</span></div>
+            <div class="leg-row"><span class="dot" style="background:var(--success)"></span><span class="name">Termin gebucht</span><span class="val">28 % · 349</span></div>
+            <div class="leg-row"><span class="dot" style="background:var(--warning)"></span><span class="name">Weiterleitung</span><span class="val">15 % · 187</span></div>
+            <div class="leg-row"><span class="dot" style="background:var(--brand-2)"></span><span class="name">Info bereitgestellt</span><span class="val">10 % · 125</span></div>
+            <div class="leg-row"><span class="dot" style="background:var(--neutral)"></span><span class="name">Sonstiges</span><span class="val">5 % · 64</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card table-card">
+    <div class="tc-head">
+      <h3 style="font-size:15px">Letzte Anrufe</h3>
+      <div style="display:flex;gap:10px">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input placeholder="Anrufer oder Nummer suchen …" />
+        </div>
+        <button class="btn-ghost">Alle Anrufe</button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Zeit</th><th>Anrufer</th><th>Rufnummer</th><th>Assistent</th>
+          <th>Ergebnis</th><th class="r">Dauer</th><th>Erkannter Intent</th><th class="r">Aktionen</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+
+    <div class="tc-foot">
+      <div style="font-size:12.5px;color:var(--muted-fg)" class="tabnum">1–5 von 1.248 Anrufen</div>
+      <div class="pg">
+        <button>‹</button>
+        <button class="active">1</button><button>2</button><button>3</button>
+        <span style="color:var(--label);align-self:center;padding:0 4px">…</span>
+        <button>178</button>
+        <button>›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Drawer -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer">
+  <div class="d-head">
+    <div class="d-top">
+      <div>
+        <div class="d-id" id="d-id">Gespräch #CS-240524-1042</div>
+        <div class="d-name" id="d-name">Max Müller</div>
+        <div class="d-meta" id="d-meta">24.06.2024, 10:42 · 08:34 Min · Vertriebs-Assistent</div>
+      </div>
+      <button class="x" id="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="d-tabs">
+      <button class="active">Zusammenfassung</button>
+      <button>Transkript</button>
+    </div>
+  </div>
+
+  <div class="d-body">
+    <div class="player">
+      <div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+      <div class="pbar"><i></i></div>
+      <span class="ptime">02:54 / 08:34</span>
+    </div>
+
+    <div class="d-sec">
+      <h4>Zusammenfassung</h4>
+      <p class="d-sum" id="d-sum"></p>
+    </div>
+
+    <div class="d-grid">
+      <div class="d-field"><div class="k">Ziel</div><div class="v" id="d-goal">Beratung gewünscht</div></div>
+      <div class="d-field"><div class="k">Ergebnis</div><div class="v" id="d-res">Termin gebucht</div></div>
+      <div class="d-field"><div class="k">Stimmung</div><div class="v">Positiv</div></div>
+      <div class="d-field"><div class="k">Wissensabdeckung</div><div class="v">96 %</div></div>
+    </div>
+
+    <div class="d-sec">
+      <h4>Tags</h4>
+      <div class="tags">
+        <span class="tag">Neukunde</span><span class="tag">Beratung</span><span class="tag">Premium-Interesse</span>
+      </div>
+    </div>
+
+    <div class="d-sec">
+      <h4>Interne Notiz</h4>
+      <textarea placeholder="Notiz zu diesem Gespräch hinzufügen …"></textarea>
+    </div>
+  </div>
+
+  <div class="d-foot">
+    <button class="btn-primary">Notiz speichern</button>
+    <button class="btn-ghost">Als CRM-Eintrag</button>
+  </div>
+</aside>
+
+<script>
+  // ---- Beispieldaten ----
+  const calls = [
+    {id:"CS-240524-1042", t:"24.06.2024, 10:42", name:"Max Müller", num:"+49 151 12345678", bot:"Vertriebs-Assistent", res:"Termin gebucht", resCls:"b-green", dur:"08:34", intent:"Beratung / Angebot", goal:"Beratung gewünscht",
+     sum:"Herr Müller interessierte sich für das Premium-Paket und wollte die Konditionen für ein Team von 8 Personen klären. Clara hat die wichtigsten Eckdaten erläutert und einen Beratungstermin für kommenden Donnerstag um 14:00 Uhr gebucht."},
+    {id:"CS-240524-1031", t:"24.06.2024, 10:31", name:"Anna Becker", num:"+49 160 98765432", bot:"Vertriebs-Assistent", res:"Anfrage beantwortet", resCls:"b-indigo", dur:"05:21", intent:"Produktinformation", goal:"Produktinfo",
+     sum:"Frau Becker hatte Fragen zur Verfügbarkeit und zu den Versandkosten. Alle Fragen konnten direkt beantwortet werden, kein Termin nötig."},
+    {id:"CS-240524-1018", t:"24.06.2024, 10:18", name:"Peter Schneider", num:"+49 171 56789012", bot:"Support-Assistent", res:"Weiterleitung", resCls:"b-orange", dur:"03:12", intent:"Technisches Problem", goal:"Support-Anliegen",
+     sum:"Herr Schneider meldete ein technisches Problem mit seinem Account-Login. Da der Fall eine manuelle Prüfung erforderte, wurde das Gespräch an einen Mitarbeiter weitergeleitet."},
+    {id:"CS-240524-1002", t:"24.06.2024, 10:02", name:"Julia Weber", num:"+49 152 34567890", bot:"Vertriebs-Assistent", res:"Termin gebucht", resCls:"b-green", dur:"07:45", intent:"Beratung / Angebot", goal:"Beratung gewünscht",
+     sum:"Frau Weber wünschte ein individuelles Angebot. Clara hat die Anforderungen aufgenommen und einen Rückruftermin mit dem Vertrieb vereinbart."},
+    {id:"CS-240524-0947", t:"24.06.2024, 09:47", name:"Thomas Braun", num:"+49 151 22334455", bot:"Support-Assistent", res:"Info bereitgestellt", resCls:"b-gray", dur:"04:11", intent:"Allgemeine Anfrage", goal:"Allgemeine Frage",
+     sum:"Herr Braun erkundigte sich nach den Öffnungszeiten und der Anfahrt. Die Informationen wurden bereitgestellt, das Anliegen war damit abgeschlossen."},
+  ];
+
+  const tb = document.getElementById('rows');
+  calls.forEach((c,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="num">${c.t.split(', ')[1]}</td>
+      <td><div class="who">${c.name}</div><div class="sub">${c.t.split(',')[0]}</div></td>
+      <td class="num">${c.num}</td>
+      <td><span class="sub" style="color:var(--fg)">${c.bot}</span></td>
+      <td><span class="badge ${c.resCls}">${c.res}</span></td>
+      <td class="r num">${c.dur}</td>
+      <td class="intent">${c.intent}</td>
+      <td><div class="act">
+        <button class="icbtn" title="Aufnahme abspielen"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+        <button class="icbtn" title="Mehr"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
+      </div></td>`;
+    tr.addEventListener('click',()=>open(c,tr));
+    tb.appendChild(tr);
+  });
+
+  const drawer=document.getElementById('drawer'), scrim=document.getElementById('scrim');
+  function open(c,tr){
+    document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('sel'));
+    tr.classList.add('sel');
+    document.getElementById('d-id').textContent='Gespräch #'+c.id;
+    document.getElementById('d-name').textContent=c.name;
+    document.getElementById('d-meta').textContent=`${c.t} · ${c.dur} Min · ${c.bot}`;
+    document.getElementById('d-sum').textContent=c.sum;
+    document.getElementById('d-goal').textContent=c.goal;
+    document.getElementById('d-res').textContent=c.res;
+    drawer.classList.add('show'); scrim.classList.add('show');
+  }
+  function close(){drawer.classList.remove('show');scrim.classList.remove('show');document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('sel'));}
+  document.getElementById('close').onclick=close;
+  scrim.onclick=close;
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+
+  // ---- Linien-Chart ----
+  (function(){
+    const anrufe=[42,55,48,63,58,71,66,78,72,84,80,92,88,96];
+    const termine=[8,11,9,14,12,16,15,19,17,22,20,24,23,27];
+    const W=560,H=200,pl=34,pr=8,pt=12,pb=24;
+    const maxV=100, n=anrufe.length;
+    const x=i=> pl + i*(W-pl-pr)/(n-1);
+    const y=v=> pt + (1-v/maxV)*(H-pt-pb);
+    const path=arr=>arr.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)).join(' ');
+    let g='';
+    [0,25,50,75,100].forEach(t=>{const yy=y(t);g+=`<line x1="${pl}" y1="${yy}" x2="${W-pr}" y2="${yy}" stroke="#eef0f2"/>`+
+      `<text x="${pl-8}" y="${yy+3}" text-anchor="end" font-size="10" fill="#9ca3af">${t}</text>`;});
+    g+=`<path d="${path(anrufe)}" fill="none" stroke="#4f46e5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`;
+    g+=`<path d="${path(termine)}" fill="none" stroke="#1e9e63" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`;
+    anrufe.forEach((v,i)=>{if(i%2===0||i===n-1)g+=`<circle cx="${x(i)}" cy="${y(v)}" r="2.6" fill="#fff" stroke="#4f46e5" stroke-width="2"/>`;});
+    document.getElementById('line').innerHTML=g;
+  })();
+
+  // ---- Ergebnis-Donut ----
+  (function(){
+    const segs=[[42,'#4f46e5'],[28,'#1e9e63'],[15,'#ea8a0b'],[10,'#818cf8'],[5,'#cbd5e1']];
+    const r=42,cx=52,cy=52,C=2*Math.PI*r;let off=0,s='';
+    s+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#eef0f2" stroke-width="13"/>`;
+    segs.forEach(([p,col])=>{const len=C*p/100;
+      s+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="13" stroke-dasharray="${len-2} ${C-len+2}" stroke-dashoffset="${-off}" transform="rotate(-90 ${cx} ${cy})" stroke-linecap="round"/>`;
+      off+=len;});
+    document.getElementById('resdonut').innerHTML=s;
+  })();
+</script>
+</body>
+</html>
