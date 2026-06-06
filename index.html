@@ -90,6 +90,17 @@
   .search input{border:1px solid var(--border);border-radius:9px;font:inherit;font-size:12.5px;padding:7px 11px 7px 30px;width:210px;outline:none;background:var(--bg)}
   .search input:focus{border-color:var(--purple)}
   .search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--label)}
+  .filterbar{display:flex;gap:10px;margin-top:24px;margin-bottom:14px}
+  .search.big{flex:1}
+  .search.big input{width:100%}
+  .fselect,.fdate{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;background:var(--bg);font-size:12.5px;color:var(--muted-fg);padding:8px 12px;cursor:pointer}
+  .fselect{min-width:185px;justify-content:space-between}
+  .fdate{min-width:140px;justify-content:space-between}
+  .fselect svg,.fdate svg{width:14px;height:14px;color:var(--label);flex:none}
+  .telnum{color:#4f46e5;font-variant-numeric:tabular-nums}
+  td.chev,th.chev{width:30px;padding-right:0}
+  .chev svg{width:15px;height:15px;color:var(--label);transition:transform .15s}
+  tr.sel .chev svg{transform:rotate(90deg);color:var(--purple)}
   .btn-ghost{border:1px solid var(--border);background:var(--bg);font:inherit;font-size:12.5px;font-weight:500;color:var(--fg);padding:7px 13px;border-radius:9px;cursor:pointer}
   .btn-ghost:hover{background:var(--muted-bg)}
 
@@ -304,32 +315,32 @@
     </div>
   </div>
 
-  <!-- Table -->
-  <div class="card table-card">
-    <div class="tc-head">
-      <h3>Letzte Anrufe</h3>
-      <div style="display:flex;gap:9px">
-        <div class="search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-          <input placeholder="Suche …" />
-        </div>
-        <button class="btn-ghost">Alle Anrufe anzeigen</button>
-      </div>
+  <!-- Filterleiste -->
+  <div class="filterbar">
+    <div class="search big">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input placeholder="Nach Anrufer oder Nummer suchen …" />
     </div>
+    <div class="fselect">Alle Ergebnisse <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="fdate"><span>TT.mm.jjjj</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+  </div>
+
+  <!-- Tabelle -->
+  <div class="card table-card">
     <table>
       <thead>
         <tr>
-          <th>Zeit</th><th>Anrufer</th><th>Rufnummer</th><th>Assistent</th>
-          <th>Ergebnis</th><th class="r">Dauer</th><th class="r">Min</th><th>Erkannter Intent</th><th class="r">Aktionen</th>
+          <th class="chev"></th>
+          <th>Datum / Uhrzeit</th><th>Anrufer</th><th>Telefonnummer</th>
+          <th class="r">Dauer</th><th class="r">Ergebnis</th>
         </tr>
       </thead>
       <tbody id="rows"></tbody>
     </table>
     <div class="tc-foot">
-      <div style="font-size:12px;color:var(--muted-fg)" class="tabnum">1–5 von 1.248 Anrufen</div>
+      <div style="font-size:12px;color:var(--muted-fg)" class="tabnum">1–10 von 12</div>
       <div class="pg">
-        <button>‹</button><button class="active">1</button><button>2</button><button>3</button>
-        <span style="color:var(--label);align-self:center;padding:0 3px">…</span><button>178</button><button>›</button>
+        <button>‹</button><button class="active">1</button><button>2</button><button>›</button>
       </div>
     </div>
   </div>
@@ -420,38 +431,37 @@
 
   // Table
   const calls=[
-    {id:"CS-240524-1042",t:"24.06.2024, 10:42",name:"Max Müller",num:"+49 151 12345678",bot:"Vertriebs-Assistent",res:"Termin gebucht",resCls:"b-green",dur:"08:34",min:"8,6",intent:"Beratung / Angebot",goal:"Beratung & Angebot gewünscht",
-     sum:"Herr Müller interessierte sich für das Premium-Paket und wollte die Konditionen für ein Team von 8 Personen klären. Clara hat die Eckdaten erläutert und einen Beratungstermin für Donnerstag 14:00 Uhr gebucht.",
-     tasks:["Beratungstermin gebucht","Bedarf für 8 Lizenzen notiert","Angebots-Infos versendet"],tags:["Neukunde","Premium-Interesse","Zufrieden"]},
-    {id:"CS-240524-1031",t:"24.06.2024, 10:31",name:"Anna Becker",num:"+49 160 98765432",bot:"Vertriebs-Assistent",res:"Anfrage beantwortet",resCls:"b-purple",dur:"05:21",min:"5,4",intent:"Produktinformation",goal:"Produktinformation gewünscht",
-     sum:"Frau Becker hatte Fragen zur Verfügbarkeit und zu den Versandkosten. Alle Fragen konnten direkt beantwortet werden, kein Termin nötig.",
-     tasks:["Verfügbarkeit geprüft","Versandkosten genannt","Folge-Infos per Mail versendet"],tags:["Bestandskunde","Schnelle Lösung"]},
-    {id:"CS-240524-1018",t:"24.06.2024, 10:18",name:"Peter Schneider",num:"+49 171 56789012",bot:"Support-Assistent",res:"Weiterleitung",resCls:"b-amber",dur:"03:12",min:"3,2",intent:"Technisches Problem",goal:"Technisches Support-Anliegen",
-     sum:"Herr Schneider meldete ein Problem mit seinem Account-Login. Da der Fall eine manuelle Prüfung erforderte, wurde an einen Mitarbeiter weitergeleitet.",
-     tasks:["Problem aufgenommen","An Support-Mitarbeiter übergeben","Rückrufwunsch notiert"],tags:["Technik","Eskalation","DSGVO-konform"]},
-    {id:"CS-240524-1002",t:"24.06.2024, 10:02",name:"Julia Weber",num:"+49 152 34567890",bot:"Vertriebs-Assistent",res:"Termin gebucht",resCls:"b-green",dur:"07:45",min:"7,8",intent:"Beratung / Angebot",goal:"Individuelles Angebot gewünscht",
-     sum:"Frau Weber wünschte ein individuelles Angebot. Clara hat die Anforderungen aufgenommen und einen Rückruftermin mit dem Vertrieb vereinbart.",
-     tasks:["Anforderungen aufgenommen","Rückruftermin vereinbart","Vertrieb informiert"],tags:["Neukunde","Angebot"]},
-    {id:"CS-240524-0947",t:"24.06.2024, 09:47",name:"Thomas Braun",num:"+49 151 22334455",bot:"Support-Assistent",res:"Info bereitgestellt",resCls:"b-gray",dur:"04:11",min:"4,2",intent:"Allgemeine Anfrage",goal:"Allgemeine Frage",
-     sum:"Herr Braun erkundigte sich nach Öffnungszeiten und Anfahrt. Die Informationen wurden bereitgestellt, das Anliegen war abgeschlossen.",
-     tasks:["Öffnungszeiten genannt","Anfahrt erklärt"],tags:["Allgemein","Freundlich"]},
+    {t:"04.06.2026, 12:43",num:"+4915155584845",dur:"1 Min",res:"Info gegeben",resCls:"b-gray",bot:"Telefon-Assistent",goal:"Allgemeine Frage",
+     sum:"Kurze Auskunft zu den Öffnungszeiten. Das Anliegen war damit abschließend geklärt.",tasks:["Öffnungszeiten genannt"],tags:["Allgemein","Schnelle Lösung"]},
+    {t:"03.06.2026, 22:10",num:"+4915155584845",dur:"1.2 Min",res:"Info gegeben",resCls:"b-gray",bot:"Telefon-Assistent",goal:"Preisauskunft",
+     sum:"Frage zu den Paketpreisen beantwortet, kein weiterer Bedarf.",tasks:["Preisinfo gegeben"],tags:["Preisfrage"]},
+    {t:"03.06.2026, 22:04",num:"+4915155584845",dur:"1 Min",res:"Termin gebucht",resCls:"b-green",bot:"Vertriebs-Assistent",goal:"Beratung gewünscht",
+     sum:"Beratungstermin vereinbart und Bestätigung per Mail versendet.",tasks:["Termin gebucht","Bestätigung versendet"],tags:["Neukunde","Beratung"]},
+    {t:"03.06.2026, 21:57",num:"+4915155584845",dur:"0.8 Min",res:"Termin gebucht",resCls:"b-green",bot:"Vertriebs-Assistent",goal:"Beratung gewünscht",
+     sum:"Kurzer Anruf, Wunschtermin direkt gebucht.",tasks:["Termin gebucht"],tags:["Beratung"]},
+    {t:"03.06.2026, 21:52",num:"+4915155584845",dur:"0.6 Min",res:"Termin gebucht",resCls:"b-green",bot:"Vertriebs-Assistent",goal:"Rückruf gewünscht",
+     sum:"Rückruftermin mit dem Vertrieb vereinbart.",tasks:["Rückruf terminiert"],tags:["Rückruf"]},
+    {t:"03.06.2026, 08:44",num:"",dur:"15 Min",res:"Termin gebucht",resCls:"b-green",bot:"Vertriebs-Assistent",goal:"Ausführliche Beratung",
+     sum:"Ausführliches Gespräch zum Leistungsumfang, anschließend Termin gebucht.",tasks:["Bedarf aufgenommen","Termin gebucht","Unterlagen versendet"],tags:["Neukunde","Premium-Interesse"]},
+    {t:"03.06.2026, 08:14",num:"+49017157755",dur:"10 Min",res:"Termin gebucht",resCls:"b-green",bot:"Vertriebs-Assistent",goal:"Angebot gewünscht",
+     sum:"Anforderungen für ein individuelles Angebot aufgenommen und Termin vereinbart.",tasks:["Anforderungen notiert","Termin gebucht"],tags:["Angebot"]},
+    {t:"02.06.2026, 19:13",num:"+49170000111",dur:"1 Min",res:"Unklar",resCls:"b-amber",bot:"Telefon-Assistent",goal:"Anliegen unklar",
+     sum:"Der Anrufer hat sein Anliegen nicht genannt, die Verbindung wurde früh beendet.",tasks:["Anruf erfasst"],tags:["Unklar"]},
+    {t:"02.06.2026, 19:08",num:"+49170000111",dur:"1 Min",res:"Unklar",resCls:"b-amber",bot:"Telefon-Assistent",goal:"Anliegen unklar",
+     sum:"Kurzer Anruf ohne erkennbares Anliegen.",tasks:["Anruf erfasst"],tags:["Unklar"]},
+    {t:"02.06.2026, 18:43",num:"+4915155584845",dur:"0.3 Min",res:"Unklar",resCls:"b-amber",bot:"Telefon-Assistent",goal:"Anliegen unklar",
+     sum:"Sehr kurzer Anruf, kein Anliegen erfasst.",tasks:["Anruf erfasst"],tags:["Unklar"]},
   ];
   const tb=document.getElementById('rows');
   calls.forEach(c=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td class="num">${c.t.split(', ')[1]}</td>
-      <td><div class="who">${c.name}</div><div class="sub">${c.t.split(',')[0]}</div></td>
-      <td class="num">${c.num}</td>
-      <td><span style="color:var(--fg)">${c.bot}</span></td>
-      <td><span class="badge ${c.resCls}">${c.res}</span></td>
+      <td class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></td>
+      <td class="num" style="color:var(--fg)">${c.t}</td>
+      <td style="color:var(--label)">${c.name||"—"}</td>
+      <td class="telnum">${c.num||"—"}</td>
       <td class="r num">${c.dur}</td>
-      <td class="r num">${c.min}</td>
-      <td class="intent">${c.intent}</td>
-      <td><div class="act">
-        <button class="icbtn" title="Abspielen"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
-        <button class="icbtn" title="Mehr"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
-      </div></td>`;
+      <td class="r"><span class="badge ${c.resCls}">${c.res}</span></td>`;
     tr.addEventListener('click',()=>open(c,tr));
     tb.appendChild(tr);
   });
@@ -459,18 +469,18 @@
   const drawer=document.getElementById('drawer'),scrim=document.getElementById('scrim');
   function open(c,tr){
     document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('sel'));tr.classList.add('sel');
-    document.getElementById('d-id').textContent=c.num;
+    document.getElementById('d-id').textContent=c.num||"Unbekannte Nummer";
     document.getElementById('d-date').textContent=c.t;
-    document.getElementById('d-dur').textContent=c.dur+' Min';
+    document.getElementById('d-dur').textContent=c.dur;
     document.getElementById('d-bot').textContent=c.bot;
     document.getElementById('d-sum').textContent=c.sum;
     document.getElementById('d-goal').textContent=c.goal;
     document.getElementById('d-res').textContent=c.res;
     // Ziel-Badge dynamisch
-    const fwd=c.res==='Weiterleitung';
+    const unresolved=c.res==='Unklar';
     const badge=document.getElementById('d-goalbadge');
-    badge.className='badge-ok'+(fwd?' badge-warn':'');
-    badge.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="${fwd?'M5 12h14M13 6l6 6-6 6':'M20 6 9 17l-5-5'}"/></svg>${fwd?'Weitergeleitet':'Gelöst'}`;
+    badge.className='badge-ok'+(unresolved?' badge-warn':'');
+    badge.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="${unresolved?'M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z':'M20 6 9 17l-5-5'}"/></svg>${unresolved?'Unklar':'Gelöst'}`;
     // Aufgaben
     document.getElementById('d-tasks').innerHTML=c.tasks.map(t=>
       `<div class="task"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>${t}</div>`).join('');
