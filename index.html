@@ -150,6 +150,34 @@
   .btn-primary{flex:1;background:var(--fg);color:#fff;border:0;font:inherit;font-size:12.5px;font-weight:500;padding:10px;border-radius:9px;cursor:pointer}
   .btn-primary:hover{background:#26282d}
 
+  /* drawer — Screen-2 exakt */
+  .d-title2{font-size:16px;font-weight:600;letter-spacing:-.015em;color:var(--fg)}
+  .navgrp{display:flex;gap:6px;align-items:center;flex:none}
+  .navgrp .nb{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted-fg)}
+  .navgrp .nb:hover{background:var(--muted-bg);color:var(--fg)} .navgrp .nb svg{width:14px;height:14px}
+  .d-metarow{display:flex;flex-wrap:wrap;gap:14px;margin-top:11px}
+  .d-mi{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted-fg);font-variant-numeric:tabular-nums}
+  .d-mi svg{width:13px;height:13px;color:var(--label);stroke-width:1.8}
+  .tabs2{display:flex;gap:22px;margin-top:16px;border-bottom:1px solid var(--border)}
+  .tabs2 button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:500;color:var(--muted-fg);padding:0 0 11px;cursor:pointer;position:relative;margin-bottom:-1px}
+  .tabs2 button.active{color:var(--fg)}
+  .tabs2 button.active::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--purple);border-radius:2px}
+  .sech{font-size:13px;font-weight:600;color:var(--fg);margin-bottom:9px}
+  .rowb{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .badge-ok{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;background:var(--green-soft);color:var(--green)}
+  .badge-warn{background:var(--amber-soft);color:var(--amber)}
+  .badge-ok svg{width:11px;height:11px;stroke-width:2.6}
+  .val-line{font-size:13px;color:var(--fg);margin-top:8px}
+  .tasklist{display:flex;flex-direction:column;gap:11px}
+  .task{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--fg)}
+  .task .ck{width:18px;height:18px;border-radius:50%;background:var(--green-soft);color:var(--green);display:flex;align-items:center;justify-content:center;flex:none}
+  .task .ck svg{width:11px;height:11px;stroke-width:2.6}
+  .note-box{position:relative}
+  .note-box textarea{min-height:90px;padding-bottom:44px}
+  .note-save{position:absolute;right:8px;bottom:8px;background:var(--purple);color:#fff;border:0;font:inherit;font-size:12px;font-weight:500;padding:7px 15px;border-radius:8px;cursor:pointer}
+  .note-save:hover{filter:brightness(.94)}
+  .tag2{font-size:11.5px;font-weight:500;padding:4px 11px;border-radius:999px;background:var(--purple-soft);color:var(--purple)}
+
   .note{max-width:1080px;margin:0 auto;padding:12px 26px 0}
   .note-in{background:var(--purple-soft);border:1px solid #e2dcfb;border-radius:10px;padding:10px 14px;font-size:12px;color:#5b46c9}
 
@@ -304,32 +332,49 @@
 <aside class="drawer" id="drawer">
   <div class="d-head">
     <div class="d-top">
-      <div>
-        <div class="d-id" id="d-id">Gespräch #CS-240524-1042</div>
-        <div class="d-name" id="d-name">Max Müller</div>
-        <div class="d-meta" id="d-meta">24.06.2024, 10:42 · 08:34 Min · Vertriebs-Assistent</div>
+      <div class="d-title2" id="d-id">Gespräch #CS-240524-1042</div>
+      <div class="navgrp">
+        <button class="nb" title="Vorheriger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button class="nb" title="Nächster"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        <button class="nb" id="close" title="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       </div>
-      <button class="x" id="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
-    <div class="d-tabs"><button class="active">Zusammenfassung</button><button>Transkript</button></div>
+    <div class="d-metarow">
+      <span class="d-mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span id="d-date">24.06.2024, 10:42</span></span>
+      <span class="d-mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span id="d-dur">08:14 Min</span></span>
+      <span class="d-mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span id="d-bot">Support-Assistent</span></span>
+    </div>
+    <div class="tabs2"><button class="active">Zusammenfassung</button><button>Details</button></div>
   </div>
   <div class="d-body">
-    <div class="player">
-      <div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
-      <div class="pbar"><i></i></div>
-      <span class="ptime">02:54 / 08:34</span>
+    <div class="d-sec">
+      <div class="sech">Zusammenfassung</div>
+      <p class="d-sum" id="d-sum"></p>
     </div>
-    <div class="d-sec"><h4>Zusammenfassung</h4><p class="d-sum" id="d-sum"></p></div>
-    <div class="d-grid">
-      <div class="d-field"><div class="k">Ziel</div><div class="v" id="d-goal">Beratung gewünscht</div></div>
-      <div class="d-field"><div class="k">Ergebnis</div><div class="v" id="d-res">Termin gebucht</div></div>
-      <div class="d-field"><div class="k">Stimmung</div><div class="v">Positiv</div></div>
-      <div class="d-field"><div class="k">Wissensabdeckung</div><div class="v">96 %</div></div>
+    <div class="d-sec">
+      <div class="rowb"><div class="sech" style="margin:0">Ziel</div><span class="badge-ok" id="d-goalbadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Gelöst</span></div>
+      <div class="val-line" id="d-goal">Beratung &amp; Angebot gewünscht</div>
     </div>
-    <div class="d-sec"><h4>Tags</h4><div class="tags"><span class="tag">Neukunde</span><span class="tag">Beratung</span><span class="tag">Premium-Interesse</span></div></div>
-    <div class="d-sec"><h4>Interne Notiz</h4><textarea placeholder="Notiz zu diesem Gespräch hinzufügen …"></textarea></div>
+    <div class="d-sec">
+      <div class="sech">Ergebnis</div>
+      <div class="val-line" id="d-res">Termin gebucht</div>
+    </div>
+    <div class="d-sec">
+      <div class="sech">Erledigte Aufgaben</div>
+      <div class="tasklist" id="d-tasks"></div>
+    </div>
+    <div class="d-sec">
+      <div class="sech">Notizen</div>
+      <div class="note-box">
+        <textarea placeholder="Notiz hinzufügen …"></textarea>
+        <button class="note-save">Speichern</button>
+      </div>
+    </div>
+    <div class="d-sec">
+      <div class="sech">Tags</div>
+      <div class="tags" id="d-tags"></div>
+    </div>
   </div>
-  <div class="d-foot"><button class="btn-primary">Notiz speichern</button><button class="btn-ghost">Als CRM-Eintrag</button></div>
 </aside>
 
 <script>
@@ -382,16 +427,21 @@
 
   // Table
   const calls=[
-    {id:"CS-240524-1042",t:"24.06.2024, 10:42",name:"Max Müller",num:"+49 151 12345678",bot:"Vertriebs-Assistent",res:"Termin gebucht",resCls:"b-green",dur:"08:34",min:"8,6",intent:"Beratung / Angebot",goal:"Beratung gewünscht",
-     sum:"Herr Müller interessierte sich für das Premium-Paket und wollte die Konditionen für ein Team von 8 Personen klären. Clara hat die Eckdaten erläutert und einen Beratungstermin für Donnerstag 14:00 Uhr gebucht."},
-    {id:"CS-240524-1031",t:"24.06.2024, 10:31",name:"Anna Becker",num:"+49 160 98765432",bot:"Vertriebs-Assistent",res:"Anfrage beantwortet",resCls:"b-purple",dur:"05:21",min:"5,4",intent:"Produktinformation",goal:"Produktinfo",
-     sum:"Frau Becker hatte Fragen zur Verfügbarkeit und zu den Versandkosten. Alle Fragen konnten direkt beantwortet werden, kein Termin nötig."},
-    {id:"CS-240524-1018",t:"24.06.2024, 10:18",name:"Peter Schneider",num:"+49 171 56789012",bot:"Support-Assistent",res:"Weiterleitung",resCls:"b-amber",dur:"03:12",min:"3,2",intent:"Technisches Problem",goal:"Support-Anliegen",
-     sum:"Herr Schneider meldete ein Problem mit seinem Account-Login. Da der Fall eine manuelle Prüfung erforderte, wurde an einen Mitarbeiter weitergeleitet."},
-    {id:"CS-240524-1002",t:"24.06.2024, 10:02",name:"Julia Weber",num:"+49 152 34567890",bot:"Vertriebs-Assistent",res:"Termin gebucht",resCls:"b-green",dur:"07:45",min:"7,8",intent:"Beratung / Angebot",goal:"Beratung gewünscht",
-     sum:"Frau Weber wünschte ein individuelles Angebot. Clara hat die Anforderungen aufgenommen und einen Rückruftermin mit dem Vertrieb vereinbart."},
+    {id:"CS-240524-1042",t:"24.06.2024, 10:42",name:"Max Müller",num:"+49 151 12345678",bot:"Vertriebs-Assistent",res:"Termin gebucht",resCls:"b-green",dur:"08:34",min:"8,6",intent:"Beratung / Angebot",goal:"Beratung & Angebot gewünscht",
+     sum:"Herr Müller interessierte sich für das Premium-Paket und wollte die Konditionen für ein Team von 8 Personen klären. Clara hat die Eckdaten erläutert und einen Beratungstermin für Donnerstag 14:00 Uhr gebucht.",
+     tasks:["Beratungstermin gebucht","Bedarf für 8 Lizenzen notiert","Angebots-Infos versendet"],tags:["Neukunde","Premium-Interesse","Zufrieden"]},
+    {id:"CS-240524-1031",t:"24.06.2024, 10:31",name:"Anna Becker",num:"+49 160 98765432",bot:"Vertriebs-Assistent",res:"Anfrage beantwortet",resCls:"b-purple",dur:"05:21",min:"5,4",intent:"Produktinformation",goal:"Produktinformation gewünscht",
+     sum:"Frau Becker hatte Fragen zur Verfügbarkeit und zu den Versandkosten. Alle Fragen konnten direkt beantwortet werden, kein Termin nötig.",
+     tasks:["Verfügbarkeit geprüft","Versandkosten genannt","Folge-Infos per Mail versendet"],tags:["Bestandskunde","Schnelle Lösung"]},
+    {id:"CS-240524-1018",t:"24.06.2024, 10:18",name:"Peter Schneider",num:"+49 171 56789012",bot:"Support-Assistent",res:"Weiterleitung",resCls:"b-amber",dur:"03:12",min:"3,2",intent:"Technisches Problem",goal:"Technisches Support-Anliegen",
+     sum:"Herr Schneider meldete ein Problem mit seinem Account-Login. Da der Fall eine manuelle Prüfung erforderte, wurde an einen Mitarbeiter weitergeleitet.",
+     tasks:["Problem aufgenommen","An Support-Mitarbeiter übergeben","Rückrufwunsch notiert"],tags:["Technik","Eskalation","DSGVO-konform"]},
+    {id:"CS-240524-1002",t:"24.06.2024, 10:02",name:"Julia Weber",num:"+49 152 34567890",bot:"Vertriebs-Assistent",res:"Termin gebucht",resCls:"b-green",dur:"07:45",min:"7,8",intent:"Beratung / Angebot",goal:"Individuelles Angebot gewünscht",
+     sum:"Frau Weber wünschte ein individuelles Angebot. Clara hat die Anforderungen aufgenommen und einen Rückruftermin mit dem Vertrieb vereinbart.",
+     tasks:["Anforderungen aufgenommen","Rückruftermin vereinbart","Vertrieb informiert"],tags:["Neukunde","Angebot"]},
     {id:"CS-240524-0947",t:"24.06.2024, 09:47",name:"Thomas Braun",num:"+49 151 22334455",bot:"Support-Assistent",res:"Info bereitgestellt",resCls:"b-gray",dur:"04:11",min:"4,2",intent:"Allgemeine Anfrage",goal:"Allgemeine Frage",
-     sum:"Herr Braun erkundigte sich nach Öffnungszeiten und Anfahrt. Die Informationen wurden bereitgestellt, das Anliegen war abgeschlossen."},
+     sum:"Herr Braun erkundigte sich nach Öffnungszeiten und Anfahrt. Die Informationen wurden bereitgestellt, das Anliegen war abgeschlossen.",
+     tasks:["Öffnungszeiten genannt","Anfahrt erklärt"],tags:["Allgemein","Freundlich"]},
   ];
   const tb=document.getElementById('rows');
   calls.forEach(c=>{
@@ -417,11 +467,22 @@
   function open(c,tr){
     document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('sel'));tr.classList.add('sel');
     document.getElementById('d-id').textContent='Gespräch #'+c.id;
-    document.getElementById('d-name').textContent=c.name;
-    document.getElementById('d-meta').textContent=`${c.t} · ${c.dur} Min · ${c.bot}`;
+    document.getElementById('d-date').textContent=c.t;
+    document.getElementById('d-dur').textContent=c.dur+' Min';
+    document.getElementById('d-bot').textContent=c.bot;
     document.getElementById('d-sum').textContent=c.sum;
     document.getElementById('d-goal').textContent=c.goal;
     document.getElementById('d-res').textContent=c.res;
+    // Ziel-Badge dynamisch
+    const fwd=c.res==='Weiterleitung';
+    const badge=document.getElementById('d-goalbadge');
+    badge.className='badge-ok'+(fwd?' badge-warn':'');
+    badge.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="${fwd?'M5 12h14M13 6l6 6-6 6':'M20 6 9 17l-5-5'}"/></svg>${fwd?'Weitergeleitet':'Gelöst'}`;
+    // Aufgaben
+    document.getElementById('d-tasks').innerHTML=c.tasks.map(t=>
+      `<div class="task"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>${t}</div>`).join('');
+    // Tags
+    document.getElementById('d-tags').innerHTML=c.tags.map(t=>`<span class="tag2">#${t}</span>`).join('');
     drawer.classList.add('show');scrim.classList.add('show');
   }
   function close(){drawer.classList.remove('show');scrim.classList.remove('show');document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('sel'));}
